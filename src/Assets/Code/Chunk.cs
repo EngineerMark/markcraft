@@ -55,6 +55,9 @@ namespace Markcraft
         [SerializeField] private MeshCollider meshCollider;
         [SerializeField] private MeshFilter meshFilter;
 
+        private static bool isaThreadActive = false;
+        private bool activeSelf = false;
+
         private Thread generationThread;
         private bool generatorReady = false;
         private bool generationFinished = false;
@@ -94,8 +97,16 @@ namespace Markcraft
 
         public void TheadSystem()
         {
-            CalculateMapFromScratch();
-            generatorReady = true;
+            while (true)
+            {
+                if (!isaThreadActive && !activeSelf)
+                {
+                    activeSelf = true;
+                    CalculateMapFromScratch();
+                    generatorReady = true;
+                    break;
+                }
+            }
         }
 
         public static byte GetTheoreticalByte(Vector3 pos)
@@ -207,6 +218,7 @@ namespace Markcraft
         {
 
             CreateVisualMesh();
+            isaThreadActive = false;
             yield return 0;
         }
 
