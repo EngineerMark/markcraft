@@ -79,19 +79,26 @@ namespace Markcraft
             meshCollider = GetComponent<MeshCollider>();
             meshFilter = GetComponent<MeshFilter>();
 
+            ChunkPosition = transform.position;
+
+            visualMesh = new Mesh();
+            NewChunk();
+
+            gameObject.name = "Chunk " + transform.position;
+        }
+
+        private void NewChunk(){
             if (random == null)
                 random = new System.Random(System.DateTime.Now.Millisecond);
             UnityEngine.Random.seed = random.Next();
 
-            ChunkPosition = transform.position;
-
-            visualMesh = new Mesh();
             generationThread = new Thread(TheadSystem);
             generationThread.Start();
+        }
 
-            //StartCoroutine(CalculateMapFromScratch());
-
-            gameObject.name = "Chunk " + transform.position;
+        private void LoadSavedChunk(int[,,] preloadedBlocks){
+            chunkData = (int[,,])preloadedBlocks.Clone();
+            StartCoroutine(CreateVisualMeshAsync(true));
         }
 
         public void Update()
@@ -126,30 +133,6 @@ namespace Markcraft
 
         public static byte GetTheoreticalByte(Vector3 pos, Vector3 offset0, Vector3 offset1, Vector3 offset2)
         {
-            //float heightBase = 5;
-            //float maxHeight = Height - 10;
-            //float heightSwing = maxHeight - heightBase;
-            //Block brick = Block.Stone;
-            //float blobValue = CalculateNoiseValue(newPos, offset1, 0.05f);
-            //float heightmap = CalculateNoiseValue(newPos, offset0, 0.2f);
-            //float o = 0;
-            //heightmap = Mathf.Sqrt(heightmap);
-            //heightmap += (blobValue * 10) - 5f;
-            //heightmap += heightBase;
-            //for (int i = 0; i < WorldGen.singleton.octaves; i++)
-            //{
-            //    heightmap += (1 / (i + 1)) * NoiseWrapper.Ridgenoise(Mathf.Pow(i, 2) * newPos) * o;
-            //    o += heightmap;
-            //}
-
-            //heightmap += Noise.Generate(newPos.x, newPos.y, newPos.z);
-            //for (int i = 0; i < WorldGen.singleton.octaves; i++)
-            //{
-            //    float frequency = Mathf.Pow(2, i);
-            //    float amplitude = Mathf.Pow(0.5f, frequency);
-            //    heightmap += Noise.Generate(newPos.x * frequency, 0.5f, newPos.z * frequency) * amplitude;
-            //}
-
             IntVector3 newPos = new IntVector3((int)(pos.x + (int.MaxValue) * 0.5f), 0, (int)(pos.z + (int.MaxValue) * 0.5f));
             //heightmap += Noise.Generate(newPos.x * 0.07f, newPos.y * 0.07f) * 20;
             Block brick = Block.Air;
