@@ -49,6 +49,9 @@ namespace Markcraft
             get { return WorldGen.singleton.brickHeight; }
         }
 
+        private Vector3 chunkPosition;
+        public Vector3 ChunkPosition { get => chunkPosition; set => chunkPosition = value; }
+
         [SerializeField] private int[,,] chunkData;
         public Mesh visualMesh;
         [SerializeField] private MeshRenderer meshRenderer;
@@ -63,7 +66,10 @@ namespace Markcraft
         private bool generationFinished = false;
         private static System.Random random;
 
-        private Vector3 chunkPosition;
+
+        List<Vector3> vertices;
+        List<Vector2> uvs;
+        List<int> tris;
 
         private void Start()
         {
@@ -77,8 +83,9 @@ namespace Markcraft
                 random = new System.Random(System.DateTime.Now.Millisecond);
             UnityEngine.Random.seed = random.Next();
 
-            chunkPosition = transform.position;
+            ChunkPosition = transform.position;
 
+            visualMesh = new Mesh();
             generationThread = new Thread(TheadSystem);
             generationThread.Start();
 
@@ -178,7 +185,7 @@ namespace Markcraft
                 {
                     for (int z = 0; z < Width; z++)
                     {
-                        chunkData[x, y, z] = GetTheoreticalByte(new Vector3(x, y, z) + chunkPosition);
+                        chunkData[x, y, z] = GetTheoreticalByte(new Vector3(x, y, z) + ChunkPosition);
                     }
                 }
             }
@@ -192,6 +199,7 @@ namespace Markcraft
             Vector3 grain1Offset = new Vector3((float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000);
             Vector3 grain2Offset = new Vector3((float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000);
             GenerateMap();
+            CreateVisualMesh();
         }
 
         public static Biome Biome(float value)
@@ -214,21 +222,21 @@ namespace Markcraft
             return Mathf.Max(0, value);
         }
 
-        public virtual IEnumerator CreateVisualMeshAsync()
+        public virtual IEnumerator CreateVisualMeshAsync(bool gen = false)
         {
-
-            CreateVisualMesh();
-            isaThreadActive = false;
+            if (gen)
+                CreateVisualMesh();
+            ApplyChanges();
+            if(isaThreadActive)
+                isaThreadActive = false;
             yield return 0;
         }
 
         public virtual void CreateVisualMesh()
         {
-            visualMesh = new Mesh();
-
-            List<Vector3> vertices = new List<Vector3>();
-            List<Vector2> uvs = new List<Vector2>();
-            List<int> tris = new List<int>();
+            vertices = new List<Vector3>();
+            uvs = new List<Vector2>();
+            tris = new List<int>();
 
             for (int x = 0; x < Width; x++)
             {
@@ -250,10 +258,17 @@ namespace Markcraft
                     }
                 }
             }
+        }
 
-            visualMesh.vertices = vertices.ToArray();
-            visualMesh.uv = uvs.ToArray();
-            visualMesh.triangles = tris.ToArray();
+        public void ApplyChanges()
+        {
+            visualMesh = new Mesh
+            {
+                vertices = vertices.ToArray(),
+                uv = uvs.ToArray(),
+                triangles = tris.ToArray()
+            };
+
             visualMesh.RecalculateBounds();
             visualMesh.RecalculateNormals();
 
@@ -333,7 +348,7 @@ namespace Markcraft
                 return 0;
             if ((x < 0) || (z < 0) || (x >= Width) || (z >= Width))
             {
-                Vector3 worldPos = new Vector3(x, y, z) + transform.position;
+                Vector3 worldPos = new Vector3(x, y, z) + ChunkPosition;
                 Chunk chunk = Chunk.FindChunk(worldPos);
                 if (chunk == this) return 0;
                 if (chunk == null)
@@ -342,12 +357,14 @@ namespace Markcraft
                 }
                 return chunk.GetByte(worldPos);
             }
-            return chunkData[x, y, z];
+            if (chunkData != null)
+                return chunkData[x, y, z];
+            return 0;
         }
 
         public virtual int GetByte(Vector3 worldPos)
         {
-            worldPos -= transform.position;
+            worldPos -= ChunkPosition;
             int x = Mathf.FloorToInt(worldPos.x);
             int y = Mathf.FloorToInt(worldPos.y);
             int z = Mathf.FloorToInt(worldPos.z);
@@ -358,7 +375,9 @@ namespace Markcraft
         {
             for (int a = 0; a < chunks.Count; a++)
             {
-                Vector3 cpos = chunks[a].transform.position;
+                Vector3 cpos = -Vector3.one;
+                while (cpos == -Vector3.one)
+                    cpos = chunks[a].ChunkPosition;
 
                 if ((pos.x < cpos.x) || (pos.z < cpos.z) || (pos.x >= cpos.x + Width) || (pos.z >= cpos.z + Width)) continue;
                 return chunks[a];
@@ -368,7 +387,7 @@ namespace Markcraft
 
         public bool SetBrick(int brick, Vector3 worldPos)
         {
-            worldPos -= transform.position;
+            worldPos -= ChunkPosition;
             return SetBrick(brick, Mathf.FloorToInt(worldPos.x), Mathf.FloorToInt(worldPos.y), Mathf.FloorToInt(worldPos.z));
         }
 
@@ -378,30 +397,30 @@ namespace Markcraft
                 return false;
             if (chunkData[x, y, z] == brick) return false;
             chunkData[x, y, z] = brick;
-            StartCoroutine(CreateVisualMeshAsync());
+            StartCoroutine(CreateVisualMeshAsync(true));
 
             if (x == 0)
             {
-                Chunk chunk = FindChunk(new Vector3(x - 2, y, z) + transform.position);
-                if (chunk != null) StartCoroutine(chunk.CreateVisualMeshAsync());
+                Chunk chunk = FindChunk(new Vector3(x - 2, y, z) + ChunkPosition);
+                if (chunk != null) StartCoroutine(chunk.CreateVisualMeshAsync(true));
                 Debug.Log("Adjecent chunk updated as well: " + chunk);
             }
             if (x == Width - 1)
             {
-                Chunk chunk = FindChunk(new Vector3(x + 2, y, z) + transform.position);
-                if (chunk != null) StartCoroutine(chunk.CreateVisualMeshAsync());
+                Chunk chunk = FindChunk(new Vector3(x + 2, y, z) + ChunkPosition);
+                if (chunk != null) StartCoroutine(chunk.CreateVisualMeshAsync(true));
                 Debug.Log("Adjecent chunk updated as well: " + chunk);
             }
             if (z == 0)
             {
-                Chunk chunk = FindChunk(new Vector3(x, y, z - 2) + transform.position);
-                if (chunk != null) StartCoroutine(chunk.CreateVisualMeshAsync());
+                Chunk chunk = FindChunk(new Vector3(x, y, z - 2) + ChunkPosition);
+                if (chunk != null) StartCoroutine(chunk.CreateVisualMeshAsync(true));
                 Debug.Log("Adjecent chunk updated as well: " + chunk);
             }
             if (z == Width - 1)
             {
-                Chunk chunk = FindChunk(new Vector3(x, y, z + 2) + transform.position);
-                if (chunk != null) StartCoroutine(chunk.CreateVisualMeshAsync());
+                Chunk chunk = FindChunk(new Vector3(x, y, z + 2) + ChunkPosition);
+                if (chunk != null) StartCoroutine(chunk.CreateVisualMeshAsync(true));
                 Debug.Log("Adjecent chunk updated as well: " + chunk);
             }
 
