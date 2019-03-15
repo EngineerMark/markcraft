@@ -29,6 +29,8 @@ public class PlayerIO : MonoBehaviour
     [SerializeField] int effectAmount = 10;
     GameObject effectParent;
 
+    [SerializeField] Shader effectShader;
+
     void Start()
     {
         singleton = this;
@@ -137,6 +139,10 @@ public class PlayerIO : MonoBehaviour
 
             go.transform.position = p.ToVector3();
             go.SetActive(true);
+
+            Material mat = new Material(effectShader);
+            Renderer renderer = go.GetComponent<Renderer>();
+            renderer.material = mat;
         }
     }
 }
