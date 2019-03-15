@@ -92,7 +92,7 @@ namespace Markcraft
                 random = new System.Random(System.DateTime.Now.Millisecond);
             UnityEngine.Random.seed = random.Next();
 
-            generationThread = new Thread(TheadSystem);
+            generationThread = new Thread(ThreadSystem);
             generationThread.Start();
         }
 
@@ -109,7 +109,7 @@ namespace Markcraft
             generationFinished = true;
         }
 
-        public void TheadSystem()
+        public void ThreadSystem()
         {
             while (true)
             {
@@ -222,9 +222,7 @@ namespace Markcraft
             tris = new List<int>();
 
             for (int x = 0; x < Width; x++)
-            {
                 for (int y = 0; y < Height; y++)
-                {
                     for (int z = 0; z < Width; z++)
                     {
                         if (chunkData[x, y, z] == 0) continue;
@@ -239,8 +237,6 @@ namespace Markcraft
                         if (IsTransparent(x, y, z - 1)) BuildFace(brick, new Vector3(x, y, z), Vector3.up, Vector3.right, true, vertices, uvs, tris);
                         if (IsTransparent(x, y, z + 1)) BuildFace(brick, new Vector3(x, y, z + 1), Vector3.up, Vector3.right, false, vertices, uvs, tris);
                     }
-                }
-            }
         }
 
         public void ApplyChanges()
@@ -335,9 +331,7 @@ namespace Markcraft
                 Chunk chunk = Chunk.FindChunk(worldPos);
                 if (chunk == this) return 0;
                 if (chunk == null)
-                {
                     return GetTheoreticalByte(worldPos);
-                }
                 return chunk.GetByte(worldPos);
             }
             if (chunkData != null)
