@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,35 +7,71 @@ using UnityEngine;
 // Created as base math helper functions for Markcraft
 // Doesn't depend on anything but standard System namespaces and Unity classes for conversions
 
-namespace UM{
-    public struct vec3{
+namespace UM
+{
+    public struct vec3
+    {
         public float x;
         public float y;
         public float z;
 
-        public vec3(float x){
+        public vec3(float x)
+        {
             this.x = x;
             this.y = x;
             this.z = x;
         }
 
-        public vec3(float x,float y,float z)
+        public vec3(float x, float y, float z)
         {
             this.x = x;
             this.y = y;
             this.z = z;
         }
 
-        public Vector3 ToVector3(){
+        public Vector3 ToVector3()
+        {
             return ToVector3(this);
         }
 
-        public static Vector3 ToVector3(vec3 v){
+        public static Vector3 ToVector3(vec3 v)
+        {
             return new Vector3(v.x, v.y, v.z);
         }
 
-        public static vec3 ToVec3(Vector3 v){
+        public static vec3 ToVec3(Vector3 v)
+        {
             return new vec3(v.x, v.y, v.z);
+        }
+
+        public static vec3 operator +(vec3 a, vec3 b)
+        {
+            return new vec3(a.x + b.x, a.y + b.y, a.z + b.z);
+        }
+
+        public static vec3 operator +(vec3 v)
+        {
+            return new vec3() + v;
+        }
+
+        public static vec3 operator -(vec3 a, vec3 b)
+        {
+            return new vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+        }
+
+        public static vec3 operator -(vec3 v)
+        {
+            return new vec3() - v;
+        }
+
+        public static vec3 operator *(vec3 a, vec3 b)
+        {
+            return new vec3(a.x * b.x, a.y * b.y, a.z * b.z);
+        }
+
+        public static vec3 operator /(vec3 a, vec3 b)
+        {
+            return new vec3(a.x / b.x, a.y / b.y, a.z / b.z);
         }
     }
 }

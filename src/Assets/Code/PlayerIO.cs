@@ -48,8 +48,10 @@ public class PlayerIO : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        foreach(BlockParticle bp in effectParent.GetComponentsInChildren<BlockParticle>()){
-            if(bp.shouldDequeue){
+        foreach (BlockParticle bp in effectParent.GetComponentsInChildren<BlockParticle>())
+        {
+            if (bp.shouldDequeue)
+            {
                 bp.shouldDequeue = false;
                 GameObject go = bp.gameObject;
                 go.SetActive(false);
@@ -88,16 +90,12 @@ public class PlayerIO : MonoBehaviour
                 inventory.AddBlock(updateChunk.GetByte(p));
                 updateChunk.SetBrick(0, p);
                 inventoryText.text = inventory.Stringify();
-                vec3 v = vec3.ToVec3(p);
-                v.x += UnityEngine.Random.Range(-10,10)*0.1f;
-                v.y += UnityEngine.Random.Range(-10,10)*0.1f;
-                v.z += UnityEngine.Random.Range(-10,10)*0.1f;
-                GenerateBlockBreakEffect(v);
+                GenerateBlockBreakEffect(vec3.ToVec3(p), true);
             }
             else if (inventory.HasBlock(inventory.Selected))
             {
                 int block = inventory.GetBlockAtSelection(inventory.Selected);
-                if (block > 0 && inventory.GetBlockAmount(block)>0)
+                if (block > 0 && inventory.GetBlockAmount(block) > 0)
                 {
                     p += hit.normal / 4;
                     Chunk updateChunk = Chunk.FindChunk(p);
@@ -109,7 +107,8 @@ public class PlayerIO : MonoBehaviour
         inventoryText.text = inventory.Stringify();
     }
 
-    public GameObject GenerateNewParticle(Transform parent, bool enqueue = true){
+    public GameObject GenerateNewParticle(Transform parent, bool enqueue = true)
+    {
         GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
         go.transform.position = Vector3.zero;
         go.transform.localScale = new vec3(WorldGen.singleton.brickHeight * 0.08f).ToVector3();
@@ -128,20 +127,33 @@ public class PlayerIO : MonoBehaviour
         return go;
     }
 
-    public void GenerateBlockBreakEffect(vec3 p){
+    public void GenerateBlockBreakEffect(vec3 p, bool random = false)
+    {
         for (int i = 0; i < effectAmount; i++)
         {
+            vec3 updatedPos = new vec3();
+            if (random)
+            {
+                System.Random rand = new System.Random((int)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+                updatedPos.x = rand.Next(-50, 50) * 0.01f;
+                //updatedPos.y = rand.Next(-100, 100) * 0.01f;
+                updatedPos.z = rand.Next(-50, 50) * 0.01f;
+                updatedPos += new vec3(0.25f,0.25f,0.25f);
+            }
             GameObject go;
             if (blockbreakQueue.Count > 1)
                 go = blockbreakQueue.Dequeue();
             else
-                go = GenerateNewParticle(effectParent.transform,false);
+                go = GenerateNewParticle(effectParent.transform, false);
 
-            go.transform.position = p.ToVector3();
+
+            go.transform.position = (p + updatedPos).ToVector3();
             go.SetActive(true);
 
             Material mat = new Material(effectShader);
             Renderer renderer = go.GetComponent<Renderer>();
+            BlockParticle part = go.GetComponent<BlockParticle>();
+            part.shouldDequeue = false;
             renderer.material = mat;
         }
     }
@@ -155,11 +167,14 @@ public class BlockParticle : MonoBehaviour
     private float maxTimer = 10;
     public bool shouldDequeue = false;
 
-    public void Update(){
+    public void Update()
+    {
         timer += Time.deltaTime;
-        if(timer>maxTimer){
+        if (timer > maxTimer)
+        {
             // Enqueue and disable
             shouldDequeue = true;
+            timer = 0;
         }
     }
 }
