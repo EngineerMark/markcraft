@@ -96,6 +96,7 @@ namespace Markcraft
         private void LoadSavedChunk(int[,,] preloadedBlocks){
             chunkData = (int[,,])preloadedBlocks.Clone();
             StartCoroutine(CreateVisualMeshAsync(true));
+            fullyComplete = true;
         }
 
         public static void UnloadChunk(Chunk c){
