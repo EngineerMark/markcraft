@@ -4,6 +4,8 @@ using UnityEngine;
 using SimplexNoise;
 using System.Threading;
 using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Markcraft
 {
@@ -52,7 +54,7 @@ namespace Markcraft
         private Vector3 chunkPosition;
         public Vector3 ChunkPosition { get => chunkPosition; set => chunkPosition = value; }
 
-        [SerializeField] private int[,,] chunkData;
+        [SerializeField] public int[,,] chunkData;
         public Mesh visualMesh;
         [SerializeField] private MeshRenderer meshRenderer;
         [SerializeField] private MeshCollider meshCollider;
@@ -93,15 +95,37 @@ namespace Markcraft
             ChunkManager.self.Add(generationThread);
         }
 
-        private void LoadSavedChunk(int[,,] preloadedBlocks){
-            chunkData = (int[,,])preloadedBlocks.Clone();
+        private void LoadSavedChunk(string file){
+
+            if (File.Exists(file))
+            {
+                FileStream fs = File.OpenRead(file);
+                BinaryFormatter bf = new BinaryFormatter();
+
+                chunkData = (int[,,])bf.Deserialize(fs);
+                fs.Close();
+                File.Delete(file);
+            }
+            else
+                return;
+            
             StartCoroutine(CreateVisualMeshAsync(true));
             fullyComplete = true;
         }
 
         public static void UnloadChunk(Chunk c){
             string filename = string.Format("chunk.{0}.dat",c.gameObject.name);
-            string path = Application.dataPath;
+            string path = string.Format("{0}/{1}/",Application.dataPath,"temp_chunks");
+            Directory.CreateDirectory(path);
+
+            string fullpath = string.Format("{0}{1}", path, filename);
+            if(File.Exists(fullpath))
+                File.WriteAllText(fullpath, string.Empty);
+            FileStream fs = File.Create(fullpath);
+            BinaryFormatter bf = new BinaryFormatter();
+            bf.Serialize(fs, c.chunkData);
+            
+            fs.Close();
             Debug.Log(path);
         }
 

@@ -7,7 +7,7 @@ public class ChunkManager : MonoBehaviour
 {
     // This manager handles all chunk threads
     private Queue<Thread> threadQueue;
-    private const int maxParallelThreads = 4;
+    private const int maxParallelThreads = 8;
     private int currentThreadAmount = 0;
     public static ChunkManager self;
 
