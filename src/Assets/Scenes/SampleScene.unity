@@ -523,6 +523,8 @@ MonoBehaviour:
   inventory:
     selected: 0
   inventoryText: {fileID: 1068451910}
+  inventoryObject: {fileID: 79067414}
+  inventoryToggleKey: 101
   preGeneration: 150
   effectAmount: 10
   effectShader: {fileID: -6465566751694194690, guid: 4d8384aea346c134daec51336ee6c270,
@@ -643,6 +645,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1635558781}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1438111499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438111498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecc9434947ace04409ce1d7d14cfe71a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1438111504
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -661,7 +675,7 @@ MonoBehaviour:
   octaves: 4
   period: 20
   persistence: 0.8
-  viewRange: 64
+  viewRange: 32
   brickHeight: 1
   chunkPrefab: {fileID: 4681735030555303118, guid: fd90f4528fd878543994644c4b2909c9,
     type: 3}

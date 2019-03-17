@@ -9,6 +9,53 @@ using UnityEngine;
 
 namespace UM
 {
+
+    public struct sphere
+    {
+
+        public float radius;
+        public vec3 position;
+
+        public sphere(float radius, vec3 position)
+        {
+            this.radius = radius;
+            this.position = position;
+        }
+
+        public static bool IsInSphere(sphere s, vec3 pos){
+            return s.IsInSphere(pos);
+        }
+
+        public bool IsInSphere(vec3 p)
+        {
+            vec3 _p = p.Abs();
+
+            float n = (float)(Math.Pow((double)(position.x - _p.x), 2)+ Math.Pow((double)(position.y - _p.y), 2)+ Math.Pow((double)(position.z - _p.z), 2));
+            if (n < (double)Math.Pow((double)radius, 2))
+                return true;
+            return false;
+        }
+    }
+
+    public struct vec2
+    {
+        public float x;
+        public float y;
+
+        public vec2(float x)
+        {
+            this.x = x;
+            y = x;
+        }
+
+        public vec2(float x, float y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+
+    }
+
     public struct vec3
     {
         public float x;
@@ -66,6 +113,24 @@ namespace UM
         public static vec3 ToVec3(Vector3 v)
         {
             return new vec3(v.x, v.y, v.z);
+        }
+        /// <summary>
+        /// Returns every variable as an absolute unit (inverts it if it is a negative value)
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static vec3 Abs(vec3 v)
+        {
+            return new vec3(System.Math.Abs(v.x), System.Math.Abs(v.y), System.Math.Abs(v.z));
+        }
+
+        /// <summary>
+        /// Returns every variable as an absolute unit (inverts it if it is a negative value)
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public vec3 Abs(){
+            return vec3.Abs(this);
         }
 
         /// <summary>

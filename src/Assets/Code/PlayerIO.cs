@@ -19,6 +19,8 @@ public class PlayerIO : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] Text inventoryText;
+    [SerializeField] GameObject inventoryObject;
+    [SerializeField] KeyCode inventoryToggleKey = KeyCode.E;
 
     //variables for the block break effect
     private Queue<GameObject> blockbreakQueue; // Store multiple cubes so you dont need to intialize during the destruction, thus reducing performance hits
@@ -60,6 +62,7 @@ public class PlayerIO : MonoBehaviour
             }
         }
 
+        // Old inventory
         if (Input.GetKeyDown("1")) { inventory.Selected = 0; inventoryText.text = inventory.Stringify(); }
         else if (Input.GetKeyDown("2")) { inventory.Selected = 1; inventoryText.text = inventory.Stringify(); }
         else if (Input.GetKeyDown("3")) { inventory.Selected = 2; inventoryText.text = inventory.Stringify(); }
@@ -70,6 +73,14 @@ public class PlayerIO : MonoBehaviour
         else if (Input.GetKeyDown("8")) { inventory.Selected = 7; inventoryText.text = inventory.Stringify(); }
         else if (Input.GetKeyDown("9")) { inventory.Selected = 8; inventoryText.text = inventory.Stringify(); }
 
+        // New inventory
+        if (Input.GetKeyUp(inventoryToggleKey))
+        {
+            inventoryObject.SetActive(!inventoryObject.activeSelf);
+            Cursor.visible = inventoryObject.activeSelf;
+        }
+
+        // Handle block placement/destruction
         if (!Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1)) return;
 
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.5f));
@@ -91,6 +102,7 @@ public class PlayerIO : MonoBehaviour
                 updateChunk.SetBrick(0, p);
                 inventoryText.text = inventory.Stringify();
                 GenerateBlockBreakEffect(vec3.ToVec3(p), true);
+                Chunk.UnloadChunk(updateChunk);
             }
             else if (inventory.HasBlock(inventory.Selected))
             {

@@ -58,13 +58,10 @@ namespace Markcraft
         [SerializeField] private MeshCollider meshCollider;
         [SerializeField] private MeshFilter meshFilter;
 
-        private static bool isaThreadActive = false;
-        private bool activeSelf = false;
-
         private Thread generationThread;
         private bool generatorReady = false;
-        private bool generationFinished = false;
         private static System.Random random;
+        private bool fullyComplete = false;
 
 
         List<Vector3> vertices;
@@ -93,7 +90,7 @@ namespace Markcraft
             UnityEngine.Random.seed = random.Next();
 
             generationThread = new Thread(ThreadSystem);
-            generationThread.Start();
+            ChunkManager.self.Add(generationThread);
         }
 
         private void LoadSavedChunk(int[,,] preloadedBlocks){
@@ -101,26 +98,25 @@ namespace Markcraft
             StartCoroutine(CreateVisualMeshAsync(true));
         }
 
+        public static void UnloadChunk(Chunk c){
+            string filename = string.Format("chunk.{0}.dat",c.gameObject.name);
+            string path = Application.dataPath;
+            Debug.Log(path);
+        }
+
         public void Update()
         {
-            if (generatorReady && generationFinished) return;
-            generationThread.Join();
+            if (!generatorReady) return;
+            if (fullyComplete) return;
+            ChunkManager.self.Continue(generationThread);
             StartCoroutine(CreateVisualMeshAsync());
-            generationFinished = true;
+            fullyComplete = true;
         }
 
         public void ThreadSystem()
         {
-            while (true)
-            {
-                if (!isaThreadActive && !activeSelf)
-                {
-                    activeSelf = true;
-                    CalculateMapFromScratch();
-                    generatorReady = true;
-                    break;
-                }
-            }
+            CalculateMapFromScratch();
+            generatorReady = true;
         }
 
         public static byte GetTheoreticalByte(Vector3 pos)
@@ -210,8 +206,6 @@ namespace Markcraft
             if (gen)
                 CreateVisualMesh();
             ApplyChanges();
-            if(isaThreadActive)
-                isaThreadActive = false;
             yield return 0;
         }
 
