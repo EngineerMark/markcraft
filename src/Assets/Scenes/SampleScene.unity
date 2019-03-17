@@ -803,7 +803,7 @@ MonoBehaviour:
   octaves: 4
   period: 20
   persistence: 0.8
-  viewRange: 32
+  viewRange: 40
   brickHeight: 1
   chunkPrefab: {fileID: 4681735030555303118, guid: fd90f4528fd878543994644c4b2909c9,
     type: 3}
