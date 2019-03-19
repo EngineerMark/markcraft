@@ -50,6 +50,24 @@ public class PlayerIO : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Fixing performance issues (Hiding anything behind camera)
+        for (int i = 0; i < Chunk.chunks.Count; i++)
+        {
+            if (Chunk.chunks[i] == null) continue;
+
+            Vector3 screenPoint = cam.WorldToScreenPoint(Chunk.chunks[i].ChunkPosition);
+            if(GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(cam),
+                Chunk.chunks[i].GetComponent<Renderer>().bounds) 
+                && Vector3.Distance(Chunk.chunks[i].ChunkPosition,cam.transform.position)>Chunk.Width*2){
+                if (!Chunk.chunks[i].gameObject.GetComponent<MeshRenderer>().enabled)
+                    Chunk.chunks[i].gameObject.GetComponent<MeshRenderer>().enabled = true;
+            }else{
+                if (Chunk.chunks[i].gameObject.GetComponent<MeshRenderer>().enabled)
+                    Chunk.chunks[i].gameObject.GetComponent<MeshRenderer>().enabled = false;
+            }
+        }
+        
+        // Block destroy effects
         foreach (BlockParticle bp in effectParent.GetComponentsInChildren<BlockParticle>())
         {
             if (bp.shouldDequeue)

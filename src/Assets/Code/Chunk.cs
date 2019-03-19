@@ -86,7 +86,8 @@ namespace Markcraft
             gameObject.name = "Chunk " + transform.position;
         }
 
-        private void NewChunk(){
+        private void NewChunk()
+        {
             if (random == null)
                 random = new System.Random(System.DateTime.Now.Millisecond);
             UnityEngine.Random.seed = random.Next();
@@ -95,7 +96,8 @@ namespace Markcraft
             ChunkManager.self.Add(generationThread);
         }
 
-        private void LoadSavedChunk(string file){
+        private void LoadSavedChunk(string file)
+        {
 
             if (File.Exists(file))
             {
@@ -108,23 +110,24 @@ namespace Markcraft
             }
             else
                 return;
-            
+
             StartCoroutine(CreateVisualMeshAsync(true));
             fullyComplete = true;
         }
 
-        public static void UnloadChunk(Chunk c){
-            string filename = string.Format("chunk.{0}.dat",c.gameObject.name);
-            string path = string.Format("{0}/{1}/",Application.dataPath,"temp_chunks");
+        public static void UnloadChunk(Chunk c)
+        {
+            string filename = string.Format("chunk.{0}.dat", c.gameObject.name);
+            string path = string.Format("{0}/{1}/", Application.dataPath, "temp_chunks");
             Directory.CreateDirectory(path);
 
             string fullpath = string.Format("{0}{1}", path, filename);
-            if(File.Exists(fullpath))
+            if (File.Exists(fullpath))
                 File.WriteAllText(fullpath, string.Empty);
             FileStream fs = File.Create(fullpath);
             BinaryFormatter bf = new BinaryFormatter();
             bf.Serialize(fs, c.chunkData);
-            
+
             fs.Close();
             Debug.Log(path);
         }
@@ -144,6 +147,31 @@ namespace Markcraft
             generatorReady = true;
         }
 
+        public void GenerateGrass()
+        {
+            // Generate a single grass prefab on top of each highest grass block
+            // Raycast no option since not thread-safe
+            // Forced to do inefficient 3rd nested loop for y-axis
+            for (int x = 0; x < Width; x++)
+            {
+                for (int z = 0; z < Width; z++)
+                {
+                    for (int y = Height; y > 0; y--)
+                    {
+                        Vector3 p = new Vector3(x, y, z) + chunkPosition;
+                        Block b = (Block)GetByte(p);
+                        if (b == Block.Grass)
+                        {
+                            //Pos 1up
+                            p += Vector3.up * WorldGen.singleton.brickHeight + Vector3.left * 0.5f + Vector3.forward * 0.5f;
+                            GameObject.Instantiate(WorldGen.singleton.grassPrefab, p, Quaternion.identity);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         public static byte GetTheoreticalByte(Vector3 pos)
         {
             Vector3 grain0Offset = new Vector3((float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000);
@@ -158,22 +186,31 @@ namespace Markcraft
             //heightmap += Noise.Generate(newPos.x * 0.07f, newPos.y * 0.07f) * 20;
             Block brick = Block.Air;
 
-            float stone = NoiseWrapper.PerlinNoise(newPos.x, newPos.y, newPos.z, 10, 3, 1.2f);
+            float value = Mathf.Abs(NoiseWrapper.PerlinNoise(newPos.x, newPos.y, newPos.z, 100, 6, 2.3f));
+            value += Mathf.Abs(NoiseWrapper.PerlinNoise(newPos.x, newPos.y, newPos.z, 45, 3, 1.6f));
+            value += NoiseWrapper.Ridgenoise(new Vector3(newPos.x, newPos.y, newPos.z)*0.01f);
+            float stone = NoiseWrapper.PerlinNoise(newPos.x, newPos.y, newPos.z, 10, 3, 1.1f);
             stone += NoiseWrapper.PerlinNoise(newPos.x, newPos.y, newPos.z, 20, 4, 0);
             stone += 10;
+            stone /= 1.1f;
+            stone += value;
 
             float dirt = NoiseWrapper.PerlinNoise(newPos.x, newPos.y, newPos.z, 50, 2, 0) + 1;
-
-            float cave = SimplexNoise.Noise.Generate(newPos.x / 32f, newPos.z / 32f);
 
             if (pos.y < stone)
                 brick = Block.Stone;
             else if (pos.y < dirt + stone)
-                brick = Block.Grass;
-            else if (cave < 0.1f && brick != Block.Air)
-                brick = Block.Air;
-            else if (pos.y < 15 && brick == Block.Air)
+                if (pos.y < 15)
+                    brick = Block.Dirt;
+                else
+                    brick = Block.Grass;
+
+            if (pos.y <= 15 && brick == Block.Air)
                 brick = Block.Water;
+
+            //if (cave < 0.1f && brick != Block.Air)
+            //    brick = Block.Air;
+
 
             if (pos.y == 0)
                 brick = Block.Bedrock;
@@ -183,6 +220,7 @@ namespace Markcraft
 
         public virtual void GenerateMap()
         {
+            // Terrain
             for (int x = 0; x < Width; x++)
             {
                 for (int y = 0; y < Height; y++)
@@ -193,6 +231,24 @@ namespace Markcraft
                     }
                 }
             }
+
+            // Trees
+            //Vector3 treePosition = Vector3.zero;
+            //for (int y = Height-1; y > 0; y--)
+            //{
+            //    if (chunkData[(int)(Width/2), y, (int)(Width / 2)] == (int)Block.Air) continue;
+            //    treePosition = new Vector3(8, y+1, 8);
+
+            //    break;
+            //}
+            //PlaceTree(treePosition);
+        }
+
+        private void PlaceTree(Vector3 startPos)
+        {
+            if (startPos.y < Height - 10)
+                for (int i = 0; i < 6; i++)
+                    chunkData[(int)startPos.x, (int)startPos.y + i, (int)startPos.z] = (int)Block.Wood;
         }
 
         public virtual void CalculateMapFromScratch()
@@ -222,6 +278,8 @@ namespace Markcraft
             for (int i = 0; i < WorldGen.singleton.octaves; i++)
                 value += ((1 / (i + 1)) * Mathf.PerlinNoise(noiseX + Mathf.Sqrt(i + 1), noiseZ + Mathf.Sqrt(i + 1)));
             value /= WorldGen.singleton.octaves;
+
+            value += Mathf.Abs(Mathf.PerlinNoise(noiseX * 0.02f, noiseZ * 0.02f) * 40);
 
             return Mathf.Max(0, value);
         }
@@ -260,6 +318,7 @@ namespace Markcraft
 
         public void ApplyChanges()
         {
+            //GenerateGrass();
             visualMesh = new Mesh
             {
                 vertices = vertices.ToArray(),
@@ -284,11 +343,10 @@ namespace Markcraft
             float actualBrickHeight = BrickHeight;
 
             if (brick == (int)Block.Water)
-                actualBrickHeight *= 0.1f;
+                actualBrickHeight *= 0.9f;
 
-            corner.y *= actualBrickHeight;
-            up.y *= actualBrickHeight;
-            right.y *= actualBrickHeight;
+            up.y -= (1 - actualBrickHeight);
+            right.y -= (1 - actualBrickHeight);
 
 
             verts.Add(corner);

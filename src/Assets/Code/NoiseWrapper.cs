@@ -7,7 +7,7 @@ public class NoiseWrapper
 {
     public static float Ridgenoise(Vector3 pos)
     {
-        return 2 * (0.5f - Mathf.Abs(0.5f - Mathf.PerlinNoise(pos.x, pos.z)));
+        return 2 * (0.5f - Mathf.Abs(0.5f - Perlin3D(pos.x, pos.y, pos.z)));
     }
 
     public static float Perlin3D(float x, float y, float z)

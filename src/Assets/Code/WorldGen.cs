@@ -20,6 +20,7 @@ namespace Markcraft
         public float brickHeight = 1;
 
         public Chunk chunkPrefab;
+        public GameObject grassPrefab;
 
         void Awake()
         {
