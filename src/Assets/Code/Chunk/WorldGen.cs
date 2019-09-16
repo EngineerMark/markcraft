@@ -22,6 +22,8 @@ namespace Markcraft
         public Chunk chunkPrefab;
         public GameObject grassPrefab;
 
+        public float updateRate = 1;
+
         void Awake()
         {
             singleton = this;
@@ -29,7 +31,12 @@ namespace Markcraft
                 seed = Random.Range(0, int.MaxValue);
         }
 
-        void Update()
+        private void Start()
+        {
+            InvokeRepeating("UpdateTerrain", 0, updateRate);
+        }
+
+        void UpdateTerrain()
         {
             for (float x = transform.position.x-viewRange; x < transform.position.x+viewRange; x+=CHUNK_WIDTH)
             {
@@ -39,10 +46,8 @@ namespace Markcraft
                     pos.x = Mathf.Floor(pos.x / (float)CHUNK_WIDTH) * CHUNK_WIDTH;
                     pos.z = Mathf.Floor(pos.z / (float)CHUNK_WIDTH) * CHUNK_WIDTH;
 
-                    Chunk chunk = Chunk.FindChunk(pos);
-                    if (chunk != null) continue;
-
-                    chunk = (Chunk)Instantiate(chunkPrefab, pos, Quaternion.identity);
+                    if (Chunk.FindChunk(pos) != null) continue;
+                    Instantiate(chunkPrefab, pos, Quaternion.identity);
                 }
             }
         }

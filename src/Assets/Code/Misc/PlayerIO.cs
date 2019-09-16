@@ -120,7 +120,7 @@ public class PlayerIO : MonoBehaviour
                 updateChunk.SetBrick(0, p);
                 inventoryText.text = inventory.Stringify();
                 GenerateBlockBreakEffect(vec3.ToVec3(p), true);
-                Chunk.UnloadChunk(updateChunk);
+                updateChunk.SaveChunk();
             }
             else if (inventory.HasBlock(inventory.Selected))
             {

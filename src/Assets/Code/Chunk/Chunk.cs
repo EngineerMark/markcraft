@@ -133,10 +133,14 @@ namespace Markcraft
             fullyComplete = true;
         }
 
-        public static void UnloadChunk(Chunk c)
+        public void SaveChunk()
         {
-            string filename = string.Format("chunk.{0}.dat", c.gameObject.name);
-            string path = string.Format("{0}/{1}/", Application.dataPath, "temp_chunks");
+            StartCoroutine("AsyncSaveChunk");
+        }
+
+        private void AsyncSaveChunk(){
+            string filename = string.Format("chunk.{0}.dat", gameObject.name);
+            string path = string.Format("{0}/Saves/{1}/{2}/", GameManager.dataPath, GameManager.saveName, "Chunks");
             Directory.CreateDirectory(path);
 
             string fullpath = string.Format("{0}{1}", path, filename);
@@ -144,7 +148,7 @@ namespace Markcraft
                 File.WriteAllText(fullpath, string.Empty);
             FileStream fs = File.Create(fullpath);
             BinaryFormatter bf = new BinaryFormatter();
-            bf.Serialize(fs, c.chunkData);
+            bf.Serialize(fs, chunkData);
 
             fs.Close();
             Debug.Log(path);
