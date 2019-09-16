@@ -797,13 +797,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfa1b4f541d39b44fb0e3a096f7ef19e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CHUNK_WIDTH: 8
-  CHUNK_HEIGHT: 128
+  CHUNK_WIDTH: 12
+  CHUNK_HEIGHT: 256
   seed: 0
   octaves: 2
   period: 20
   persistence: 0.8
-  viewRange: 45
+  viewRange: 50
   brickHeight: 1
   chunkPrefab: {fileID: 4681735030555303118, guid: fd90f4528fd878543994644c4b2909c9,
     type: 3}

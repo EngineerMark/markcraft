@@ -10,8 +10,7 @@ Material:
   m_Name: ChunkMaterial
   m_Shader: {fileID: -6465566751694194690, guid: 4d8384aea346c134daec51336ee6c270,
     type: 3}
-  m_ShaderKeywords: BOOLEAN_CE999468_ON _GLOSSYREFLECTIONS_OFF _NORMALMAP _OCCLUSIONMAP
-    _SPECULARHIGHLIGHTS_OFF
+  m_ShaderKeywords: _NORMALMAP _OCCLUSIONMAP _SPECULARHIGHLIGHTS_OFF
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -27,6 +26,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - Texture2D_BB378A45:
         m_Texture: {fileID: 2800000, guid: 4436c5e9f4d85f845b415087c4d81047, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BaseMap:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -50,7 +53,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 00f467235f29d6147b71fc65de848c1c, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -81,14 +84,17 @@ Material:
     - _Cutoff: 0
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _EnvironmentReflections: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.067
     - _GlossyReflections: 0
     - _Metallic: 1
-    - _Mode: 1
+    - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
+    - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 0
     - _SrcBlend: 1
@@ -98,6 +104,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - Color_4545E7CE: {r: 0, g: 0.7859545, b: 1, a: 0}
+    - _BaseColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}

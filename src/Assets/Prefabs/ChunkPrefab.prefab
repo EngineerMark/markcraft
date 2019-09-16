@@ -43,11 +43,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4681735030555303114}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 11500000, guid: 79747ab07172da540ac4fc4130549416, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   visualMesh: {fileID: 0}
+  meshRenderer: {fileID: 0}
+  meshCollider: {fileID: 0}
+  meshFilter: {fileID: 0}
 --- !u!23 &4681735030555303119
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -66,6 +68,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 87e7620d76722a9448f009aa7789d168, type: 2}
+  - {fileID: 2100000, guid: 06017ec55fe8e6a44944271509b4d117, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -73,6 +76,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
