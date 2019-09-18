@@ -36,3 +36,7 @@ sysinfo.txt
 *.unitypackage
 
 src/Assets/temp_chunks/
+
+src/Assets/Saves/
+
+src/Assets/Saves.meta

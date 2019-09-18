@@ -164,7 +164,7 @@ public class PlayerIO : MonoBehaviour
             vec3 updatedPos = new vec3();
             if (random)
             {
-                System.Random rand = new System.Random((int)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+                System.Random rand = new System.Random(GameManager.saveSeed);
                 updatedPos.x = rand.Next(-50, 50) * 0.01f;
                 //updatedPos.y = rand.Next(-100, 100) * 0.01f;
                 updatedPos.z = rand.Next(-50, 50) * 0.01f;

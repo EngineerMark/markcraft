@@ -10,7 +10,6 @@ namespace Markcraft
 
         public int CHUNK_WIDTH = 16;
         public int CHUNK_HEIGHT = 256;
-        public int seed = 0;
         public int octaves = 4;
         public float period = 20.0f;
         public float persistence = 0.8f;
@@ -27,8 +26,6 @@ namespace Markcraft
         void Awake()
         {
             singleton = this;
-            if (seed == 0)
-                seed = Random.Range(0, int.MaxValue);
         }
 
         private void Start()

@@ -107,9 +107,8 @@ namespace Markcraft
         private void NewChunk()
         {
             if (random == null)
-                random = new System.Random(System.DateTime.Now.Millisecond);
-            UnityEngine.Random.seed = random.Next();
-
+                random = new System.Random(GameManager.saveSeed);
+            UnityEngine.Random.InitState(GameManager.saveSeed);
             generationThread = new Thread(ThreadSystem);
             ChunkManager.self.Add(generationThread);
         }
@@ -196,7 +195,7 @@ namespace Markcraft
         {
             terrainGen.Generate();
             caveGen.Generate();
-            //treeGen.Generate();
+            treeGen.Generate();
 
             // Check cached objects
 
