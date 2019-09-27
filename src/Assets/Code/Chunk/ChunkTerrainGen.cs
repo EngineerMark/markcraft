@@ -55,9 +55,9 @@ namespace Markcraft
                     brick = Block.Dirt;
                 else
                 {
-                    if (biome == Biome.DESERT)
-                        brick = (new System.Random(System.DateTime.Now.Millisecond).Next(1, 100) < 50) ? Block.Sand : Block.DarkSand;
-                    else
+                    //if (biome == Biome.DESERT)
+                    //    brick = (new System.Random(System.DateTime.Now.Millisecond).Next(1, 100) < 50) ? Block.Sand : Block.DarkSand;
+                    //else
                         brick = Block.Grass;
                 }
 

@@ -113,44 +113,9 @@ namespace Markcraft
             ChunkManager.self.Add(generationThread);
         }
 
-        private void LoadSavedChunk(string file)
-        {
-
-            if (File.Exists(file))
-            {
-                FileStream fs = File.OpenRead(file);
-                BinaryFormatter bf = new BinaryFormatter();
-
-                chunkData = (int[,,])bf.Deserialize(fs);
-                fs.Close();
-                File.Delete(file);
-            }
-            else
-                return;
-
-            StartCoroutine(CreateVisualMeshAsync(true));
-            fullyComplete = true;
-        }
-
         public void SaveChunk()
         {
-            StartCoroutine("AsyncSaveChunk");
-        }
-
-        private void AsyncSaveChunk(){
-            string filename = string.Format("chunk.{0}.dat", gameObject.name);
-            string path = string.Format("{0}/Saves/{1}/{2}/", GameManager.dataPath, GameManager.saveName, "Chunks");
-            Directory.CreateDirectory(path);
-
-            string fullpath = string.Format("{0}{1}", path, filename);
-            if (File.Exists(fullpath))
-                File.WriteAllText(fullpath, string.Empty);
-            FileStream fs = File.Create(fullpath);
-            BinaryFormatter bf = new BinaryFormatter();
-            bf.Serialize(fs, chunkData);
-
-            fs.Close();
-            Debug.Log(path);
+            GameManager.saveLoadSystem.SaveChunk(this);
         }
 
         public void Update()
@@ -166,8 +131,16 @@ namespace Markcraft
 
         public void ThreadSystem()
         {
-            CalculateMapFromScratch();
-            generatorReady = true;
+            if (GameManager.saveLoadSystem.LoadChunk(this))
+            {
+                CreateVisualMesh();
+                generatorReady = true;
+            }
+            else
+            {
+                CalculateMapFromScratch();
+                generatorReady = true;
+            }
         }
 
         public void GenerateGrass()
@@ -184,7 +157,7 @@ namespace Markcraft
                         Vector3 p = new Vector3(x, y, z) + chunkPosition;
                         Block b = (Block)GetByte(p);
                         if (b == Block.Grass)
-                            if(y<Height-1)
+                            if (y < Height - 1)
                                 chunkData[x, y + 1, z] = (int)Block.WaveGrass;
                     }
                 }
@@ -211,9 +184,9 @@ namespace Markcraft
         {
             chunkData = new int[Width, Height, Width];
 
-            Vector3 grain0Offset = new Vector3((float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000);
-            Vector3 grain1Offset = new Vector3((float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000);
-            Vector3 grain2Offset = new Vector3((float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000);
+            //Vector3 grain0Offset = new Vector3((float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000);
+            //Vector3 grain1Offset = new Vector3((float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000);
+            //Vector3 grain2Offset = new Vector3((float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000, (float)random.NextDouble() * 10000);
             GenerateMap();
             CreateVisualMesh();
         }

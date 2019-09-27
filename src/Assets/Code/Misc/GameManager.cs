@@ -8,8 +8,18 @@ public class GameManager : MonoBehaviour
     public static string dataPath;
     public static int saveSeed = 5;
 
+    public static SaveLoad saveLoadSystem;
+
     public void Start()
     {
         dataPath = Application.dataPath;
+        saveLoadSystem = new SaveLoad();
+        saveLoadSystem.Start();
+    }
+
+    public void Update()
+    {
+        saveLoadSystem.Update();
+
     }
 }
