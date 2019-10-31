@@ -76,7 +76,7 @@ Material:
     - Boolean_CE999468: 1
     - Vector1_60AA1AAA: 1
     - Vector1_7F4B39F6: 0.5
-    - Vector1_FA786704: 0.1
+    - Vector1_FA786704: 0.02
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
